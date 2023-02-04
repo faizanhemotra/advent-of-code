@@ -1,3 +1,5 @@
+from typing import List
+
 with open('day02/input.txt', 'r') as input_text:
     input_list = [(
         line.rstrip()
@@ -52,9 +54,51 @@ def rock_paper_scissors(plyr_zero: int, plyr_one: int, plyr_score: int = 1) -> i
             return (LOSE_SCORE if plyr_one > plyr_zero else WIN_SCORE) + plyrscore_to_return
 
 
-outcomes = []
-for move in input_list:
-    moves = move.split()
-    outcomes.append(rock_paper_scissors(int(moves[0]), int(moves[1])))
+def rps_outcomes(input_list: List[str] = input_list, sus: bool = True) -> List[int]:
+    """Wrapper around rock_paper_scissors to get game results
 
-print(sum(outcomes))
+    Parameters
+    ----------
+    input_list : List[str]
+        Input list
+
+    sus: bool
+        Sussy Baka?
+        part 2 of the day 2
+
+    Returns
+    -------
+    List[int]
+        Round results
+    """
+    outcomes = []
+    for move in input_list:
+        moves = move.split()
+        plyr_one_move = int(moves[0])
+        plyr_two_move = int(moves[1])
+        if not sus:
+            match plyr_two_move:
+                case 1:
+                    # if they choose paper we choose rock
+                    # if it's scissors we choose paper
+                    plyr_two_move = plyr_one_move - 1
+                    # if it's rock we choose scissors
+                    # this will fail for cases
+                    # where the diff between each number > 0
+                    if plyr_two_move == 0:
+                        plyr_two_move = plyr_one_move + 2
+
+                case 2:
+                    plyr_two_move = plyr_one_move
+
+                case 3:
+                    plyr_two_move = plyr_one_move + 1
+                    if plyr_two_move > 3:
+                        plyr_two_move = 1
+        outcomes.append(rock_paper_scissors(plyr_one_move, plyr_two_move))
+    return outcomes
+
+
+print(sum(rps_outcomes()))
+# part 2
+print(sum(rps_outcomes(sus=False)))
